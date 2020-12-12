@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Cart from './components/Cart';
 import Filter from './components/Filter';
 import Products from './components/Products';
 import data from './data.json';
@@ -7,6 +8,30 @@ function App() {
     const [products, setProducts] = useState(data.products)
     const [size, setSize] = useState("")
     const [sort, setSort] = useState("")
+    const [cartItems, setCartItems] = useState([])
+
+    const removeFromCart = product => {
+        const carts = cartItems.slice()
+        setCartItems(carts.filter(item => item._id !== product._id))
+    }
+
+    const addToCart = product => {
+        let alreadyInCart = false
+        const carts = cartItems.slice()
+
+        carts.forEach(item => {
+            if (item._id === product._id) {
+                item.count++
+                alreadyInCart = true
+            }
+        })
+        if (!alreadyInCart) {
+            carts.push({ ...product, count: 1 })
+        }
+
+        setCartItems(carts)
+    }
+
 
     const filterProducts = (e) => {
         if (e.target.value === '') {
@@ -19,11 +44,11 @@ function App() {
 
     }
     const sortProducts = (e) => {
-        const sort = e.target.value
-        setSort(sort)
+        const sortVal = e.target.value
+        setSort(sortVal)
         setProducts((products) => products.slice().sort((a, b) => (
-            sort === "lowest" ? a.price > b.price ? 1 : -1 :
-                sort === 'highest' ? a.price < b.price ? 1 : -1 : a._id > b._id ? 1 : -1
+            sortVal === "lowest" ? a.price > b.price ? 1 : -1 :
+                sortVal === 'highest' ? a.price < b.price ? 1 : -1 : a._id > b._id ? 1 : -1
         )))
     }
 
@@ -42,10 +67,10 @@ function App() {
                             filterProducts={filterProducts}
                             sortProducts={sortProducts}
                         />
-                        <Products products={products} />
+                        <Products products={products} addToCart={addToCart} />
                     </div>
                     <div className="sidebar">
-                        Cart Items
+                        <Cart cartItems={cartItems} removeFromCart={removeFromCart} />
                     </div>
                 </div>
             </main>
