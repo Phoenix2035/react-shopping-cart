@@ -8,11 +8,16 @@ function App() {
     const [products, setProducts] = useState(data.products)
     const [size, setSize] = useState("")
     const [sort, setSort] = useState("")
-    const [cartItems, setCartItems] = useState([])
+    const [cartItems, setCartItems] = useState(JSON.parse(localStorage.getItem('cartItems')) ? JSON.parse(localStorage.getItem('cartItems')) : [])
+
+    const createOrder = order => {
+        alert("Need to save order for " + order.name)
+    }
 
     const removeFromCart = product => {
         const carts = cartItems.slice()
         setCartItems(carts.filter(item => item._id !== product._id))
+        localStorage.setItem("cartItems", JSON.stringify(carts.filter(item => item._id !== product._id)))
     }
 
     const addToCart = product => {
@@ -28,8 +33,9 @@ function App() {
         if (!alreadyInCart) {
             carts.push({ ...product, count: 1 })
         }
-
         setCartItems(carts)
+
+        localStorage.setItem("cartItems", JSON.stringify(carts))
     }
 
 
@@ -70,7 +76,7 @@ function App() {
                         <Products products={products} addToCart={addToCart} />
                     </div>
                     <div className="sidebar">
-                        <Cart cartItems={cartItems} removeFromCart={removeFromCart} />
+                        <Cart cartItems={cartItems} removeFromCart={removeFromCart} addOrder={createOrder} />
                     </div>
                 </div>
             </main>
